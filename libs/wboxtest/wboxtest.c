@@ -6,12 +6,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -269,7 +269,7 @@ static void wboxtest_run_groups_iter(struct wboxtest *test, void *data)
 
 	/* skip if group name does not match */
 	if (strncmp(group->name, args->group_name, sizeof(group->name)))
-		return;	
+		return;
 
 	__wboxtest_run_test(test, args->test_hcpu,
 			    args->cdev, args->iterations);
@@ -310,7 +310,7 @@ static void wboxtest_run_tests_iter(struct wboxtest *test, void *data)
 
 	/* skip if test name does not match */
 	if (strncmp(test->name, args->test_name, sizeof(test->name)))
-		return;	
+		return;
 
 	__wboxtest_run_test(test, args->test_hcpu,
 			    args->cdev, args->iterations);
@@ -352,14 +352,21 @@ static void wboxtest_run_all_iter(struct wboxtest *test, void *data)
 			    args->cdev, args->iterations);
 }
 
+extern void gcov_static_init(void);
+extern void gcov_coverage_dump(void);
+
 void wboxtest_run_all(struct vmm_chardev *cdev, u32 iterations)
 {
 	struct wboxtest_run_all_args args;
+
+	gcov_static_init();
 
 	args.cdev = cdev;
 	args.iterations = iterations;
 	args.test_hcpu = vmm_smp_processor_id();
 	wboxtest_iterate(wboxtest_run_all_iter, &args);
+
+	gcov_coverage_dump();
 }
 VMM_EXPORT_SYMBOL(wboxtest_run_all);
 
@@ -398,9 +405,9 @@ static void __exit wboxtest_exit(void)
 	/* Nothing to do here. */
 }
 
-VMM_DECLARE_MODULE(MODULE_DESC, 
-			MODULE_AUTHOR, 
-			MODULE_LICENSE, 
-			MODULE_IPRIORITY, 
-			MODULE_INIT, 
+VMM_DECLARE_MODULE(MODULE_DESC,
+			MODULE_AUTHOR,
+			MODULE_LICENSE,
+			MODULE_IPRIORITY,
+			MODULE_INIT,
 			MODULE_EXIT);

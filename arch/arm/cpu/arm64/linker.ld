@@ -6,12 +6,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -25,12 +25,12 @@ OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64
 OUTPUT_ARCH("aarch64")
 ENTRY(_start)
 
-SECTIONS 
+SECTIONS
 {
 	. = TEXT_START;
 
 	. = ALIGN(0x1000); /* Need this to create proper sections */
-	
+
 	PROVIDE(_code_start = .);
 
 	/* Beginning of the code section */
@@ -46,7 +46,7 @@ SECTIONS
 
 	. = ALIGN(0x1000); /* Ensure next section is page aligned */
 
-	.init : 
+	.init :
 	{
 		PROVIDE(_init_start = .);
 
@@ -112,6 +112,13 @@ SECTIONS
 
 	/* End of the read-only data sections */
 
+    .init_array : ALIGN(8) {
+        PROVIDE_HIDDEN(__init_array_start = .);
+        KEEP (*(.init_array*))
+        KEEP(*(.init_array .ctors))
+        PROVIDE_HIDDEN(__init_array_end = .);
+    }
+
 	/* Beginning of the read-write data sections */
 
 	. = ALIGN(0x1000); /* Ensure next section is page aligned */
@@ -173,6 +180,6 @@ SECTIONS
 	/* End of the read-write data sections */
 
 	. = ALIGN(0x1000); /* Need this to create proper pages */
-	
+
 	PROVIDE(_code_end = .);
 }

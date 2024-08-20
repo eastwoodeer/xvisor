@@ -174,6 +174,11 @@ cflags+=$(cppflags)
 ifdef CONFIG_PROFILE
 cflags+=-finstrument-functions
 endif
+
+ifdef CONFIG_COVERAGE
+cflags+=-fprofile-arcs -ftest-coverage
+endif
+
 asflags=-g -Wall -nostdlib -D__ASSEMBLY__
 asflags+=$(board-asflags)
 asflags+=$(cpu-asflags)
@@ -465,6 +470,10 @@ clean:
 	$(V)find $(build_dir) -type f -name "*.elf" -exec rm -rf {} +
 	$(if $(V), @echo " (rm)        $(build_dir)/*.bin")
 	$(V)find $(build_dir) -type f -name "*.bin" -exec rm -rf {} +
+	$(if $(V), @echo " (rm)        $(build_dir)/*.gcno")
+	$(V)find $(build_dir) -type f -name "*.gcno" -exec rm -rf {} +
+	$(if $(V), @echo " (rm)        $(build_dir)/*.gcda")
+	$(V)find $(build_dir) -type f -name "*.gcda" -exec rm -rf {} +
 
 # Rule for "make distclean"
 .PHONY: distclean
@@ -512,3 +521,7 @@ savedefconfig:
 	$(V)$(MAKE) -C tools/openconf defconfig
 	./tools/openconf/conf -D $(src_dir)/arch/$(ARCH)/configs/$@ $(OPENCONF_INPUT)
 	./tools/openconf/conf -s $(OPENCONF_INPUT)
+
+.PHONY gcov:
+	lcov -d . -t 'xvisor code coverage' -o 'xvisor.info' -b . -c
+	genhtml -o build/coverage xvisor.info
